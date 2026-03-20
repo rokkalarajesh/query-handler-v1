@@ -1,4 +1,3 @@
-
 """
 Pydantic schemas for request/response validation
 """
@@ -195,6 +194,33 @@ class PartialPaymentResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+# ============= Placeholders for Colleague Module Schemas =============
+class CallNote(BaseModel):
+    note_id: Optional[str] = None
+    content: Optional[str] = None
+    created_at: Optional[datetime] = None
+
+class InvoiceItem(BaseModel):
+    document_number: Optional[str] = None
+    amount: Optional[Decimal] = None
+
+class CallFailed(BaseModel):
+    reason: Optional[str] = None
+    timestamp: Optional[datetime] = None
+
+class CallData(BaseModel):
+    call_id: Optional[str] = None
+    data: Optional[Any] = None
+
+class CollectionQueueCreate(BaseModel):
+    customer_number: Optional[UUID] = None
+    invoice_nos: Optional[list] = None
+
+class CollectionQueueSlimOut(BaseModel):
+    case_id: Optional[str] = None
+    status: Optional[str] = None
 
 
 # ============= Query Parameters =============

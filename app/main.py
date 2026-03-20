@@ -7,7 +7,8 @@ from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
 import logging
 from app.database import engine, Base
-from app.routes import router
+from app.routes.routes import router as main_router
+from app.routes.call_handle import router as call_handle_router
 from app.models import (
     CustomerMasterData, InvoiceBalanceTable, CallQueue, DunningStage,
     CallOutcome, PromiseToPay, Escalation, Dispute, DocumentCopy,
@@ -64,7 +65,8 @@ app.add_middleware(
 )
 
 # Include routes
-app.include_router(router)
+app.include_router(main_router)
+app.include_router(call_handle_router)
 
 
 # Root endpoint
