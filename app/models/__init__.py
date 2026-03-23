@@ -7,6 +7,9 @@ from sqlalchemy.orm import relationship
 from app.database import Base
 import uuid
 from datetime import datetime
+from sqlalchemy.dialects.postgresql import UUID as PG_UUID, JSONB, CITEXT, TSRANGE
+from sqlalchemy import Column, String, Numeric, DateTime, Boolean, Integer, Date, ForeignKey, JSON, Text, Index, UniqueConstraint, Numeric 
+
 
 
 class CustomerMasterData(Base):
@@ -238,3 +241,114 @@ class OtherCustomerRequest(Base):
     description = Column(Text)
     due_by = Column(Date)
     completed_at = Column(Date)
+
+
+class CustomerMaster(Base):
+    __tablename__ = "customer_master"
+
+    customer_id = Column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    tenant_id = Column(Text, nullable=False)
+    customer_name = Column(Text, nullable=False)
+
+    account_status = Column(Text, nullable=True)
+    billing_address = Column(Text, nullable=True)
+    contact_name = Column(Text, nullable=True)
+    phone_number = Column(Text, nullable=True)
+    email_address = Column(CITEXT, nullable=True)
+
+    preferred_language = Column(Text, nullable=True)
+    preferred_contact_hours = Column(Text, nullable=True)
+    agent_contact_allowed = Column(Boolean, nullable=True)
+    account_manager_name = Column(Text, nullable=True)
+    collector_name = Column(Text, nullable=True)
+    collector_phone_number = Column(Text, nullable=True)
+    collector_id = Column(Text, nullable=True)
+    credit_limit = Column(Numeric(18, 2), nullable=True)
+    payment_term = Column(Text, nullable=True)
+    billing_method = Column(Text, nullable=True)
+    total_open_balance = Column(Numeric(18, 2), nullable=True)
+    total_overdue_balance = Column(Numeric(18, 2), nullable=True)
+    dnc_status = Column(Boolean, nullable=True)
+    record_consent = Column(Boolean, nullable=True)
+    calling_window = Column(Text, nullable=True)
+    time_zone = Column(Text, nullable=True)
+
+class ARTransaction(Base):
+    __tablename__ = "ar_transactions"
+
+    transaction_id = Column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    customer_id = Column(PG_UUID(as_uuid=True), ForeignKey("customer_master.customer_id"), nullable=False)
+
+    document_number = Column(Text, nullable=False)
+    document_type = Column(Text, nullable=True)
+    document_date = Column(DateTime, nullable=True)
+    original_amount = Column(Numeric(18, 2), nullable=True)
+    outstanding_balance = Column(Numeric(18, 2), nullable=True)
+    document_status = Column(Text, nullable=True)
+    due_date = Column(DateTime, nullable=True)
+    days_past_due = Column(Integer, nullable=True)
+    purchase_order_number = Column(Text, nullable=True)
+    order_date = Column(DateTime, nullable=True)
+    delivery_date = Column(DateTime, nullable=True)
+
+    open_ptp = Column(Boolean, nullable=True)
+    open_ptp_date = Column(DateTime, nullable=True)
+    broken_ptp_flag = Column(Boolean, nullable=True)
+    broken_ptp_amount = Column(Numeric(18, 2), nullable=True)
+    broken_ptp_date = Column(DateTime, nullable=True)
+
+    open_dispute = Column(Boolean, nullable=True)
+    closed_dispute = Column(Boolean, nullable=True)
+    closed_dispute_status = Column(Text, nullable=True)
+
+    issued_credits = Column(Numeric(18, 2), nullable=True)
+    applied_payment_date = Column(DateTime, nullable=True)
+    applied_payment_amount = Column(Numeric(18, 2), nullable=True)
+
+
+class CollectionQueue(Base):
+    __tablename__ = "collection_queue"
+
+    case_id = Column(Text, primary_key=True)
+    tenant_id = Column(Text, nullable=False)
+    customer_id = Column(PG_UUID(as_uuid=True), ForeignKey("customer_master.customer_id"), nullable=False)
+
+    uniqid = Column(Text, nullable=False)
+
+    invoice_numbers = Column(JSONB, nullable=True)
+    multiple_invoice = Column(Boolean, nullable=True)
+
+    aging_bucket = Column(Text, nullable=True)
+    priority = Column(Integer, nullable=True)
+    due_at = Column(DateTime, nullable=True)
+
+    call_notes = Column(JSONB, nullable=True)
+    call_type = Column(Text, nullable=True)
+
+    activity_status = Column(Boolean, nullable=True)
+    # activity_empty_reason = Column(Text, nullable=True)
+    dnc_status = Column(Boolean, nullable=True)
+    # dnc_reason_yes = Column(Text, nullable=True)
+    record_consent = Column(Boolean, nullable=True)
+
+    calling_window = Column(TSRANGE, nullable=True)
+    time_zone = Column(Text, nullable=True)
+
+    customer_name = Column(Text, nullable=True)
+    billing_address = Column(Text, nullable=True)
+    contact_name = Column(Text, nullable=True)
+    phone_number = Column(Text, nullable=True)
+    email_address = Column(Text, nullable=True)
+    preferred_language = Column(Text, nullable=True)
+
+    call_data = Column(JSONB, nullable=True)
+    call_failed = Column(JSONB, nullable=True)
+
+    __table_args__ = (
+        UniqueConstraint("tenant_id", "customer_id", "uniqid", name="uq_collection_case_key"),
+        Index("ix_collection_queue_customer", "tenant_id", "customer_id"),
+        Index("ix_collection_queue_status", "activity_status"),
+        Index("ix_collection_queue_due", "due_at"),
+    )
+
+    customer = relationship("CustomerMaster")

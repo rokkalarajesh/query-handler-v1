@@ -10,7 +10,7 @@ from typing import Generator
 # Database configuration
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "postgresql://postgres:root@localhost:5432/collections_db"
+    "postgresql://postgres:root@localhost:5432/collections_db1"
 )
 
 # Create engine with connection pooling
