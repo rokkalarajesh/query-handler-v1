@@ -278,6 +278,244 @@ curl "http://localhost:8000/collections/call/CALL001"
   ]
 }
 ```
+Invoices API
+----------------
+API Endpoint
+GET /invoices/
+http://localhost:8000/invoices/
+
+Description
+Returns invoice records linked to customers.
+
+
+Sample Invoice Record
+
+{
+  "document_number": "INV-1001",
+  "original_amount": 15000,
+  "open_ptp": true,
+  "issued_credits": 0,
+  "outstanding_balance": 5000,
+  "open_ptp_date": "2026-02-28T00:00:00",
+  "applied_payment_date": null,
+  "customer_id": "2eae0fe9-e903-4fe9-9655-d5d8497b6d09",
+  "document_status": "OVERDUE",
+  "broken_ptp_flag": false,
+  "applied_payment_amount": null,
+  "due_date": "2026-02-20T00:00:00",
+  "broken_ptp_amount": null,
+  "days_past_due": 20,
+  "broken_ptp_date": null,
+  "transaction_id": "ddd85b87-8672-4561-bf77-4025e7826087",
+  "purchase_order_number": "PO-77",
+  "open_dispute": false,
+  "document_type": "INVOICE",
+  "order_date": "2026-01-15T00:00:00",
+  "closed_dispute": false,
+  "document_date": "2026-02-01T00:00:00",
+  "delivery_date": "2026-01-20T00:00:00",
+  "closed_dispute_status": null
+}
+
+-------------
+Call Handle API
+API Endpoint
+POST /create_collection_case_call_handle/
+http://127.0.0.1:8000/docs#/default/create_collection_case_call_handle__post
+
+Purpose
+Creates a call-handling case combining:
+✅ customer details
+✅ one or more invoices
+✅ call activity, notes, call type
+✅ DNC (Do Not Contact) settings
+✅ call failed reasons
+✅ timestamps
+✅ calling window
+✅ consent & voice mail info
+
+Sample Request Payload
+
+{
+  "customer_id": "2eae0fe9-e903-4fe9-9655-d5d8497b6d09",
+  "uniqid": "string",
+  "invoice_numbers": [
+    {
+      "inovice_n": "INV-1001",
+      "outstanding_balance": 0,
+      "overdue_status": "string",
+      "due_date": "2026-03-13T08:14:12.030Z",
+      "days_past_due": 0,
+      "purchase_order_num": "string",
+      "order_date": "2026-03-13T08:14:12.030Z",
+      "open_ptp": true,
+      "open_ptp_date": "2026-03-13T08:14:12.030Z",
+      "broken_ptp_flg": true,
+      "broken_ptp_amount": 0,
+      "broken_ptp_date": "2026-03-13T08:14:12.030Z",
+      "open_dispute": true,
+      "closed_dispute_status": "string",
+      "isseues_credits": 0
+    }
+  ],
+  "multiple_invoice": false,
+  "aging_bucket": "string",
+  "priority": 0,
+  "due_at": "2026-03-13T08:14:12.030Z",
+  "call_notes": [
+    {
+      "author": "string",
+      "note": "string",
+      "created_at": "2026-03-13T08:14:12.030Z"
+    }
+  ],
+  "call_type": "1",
+  "activity_status": true,
+  "activity_empty_reason": "string",
+  "dnc_status": true,
+  "dnc_reason_yes": "customer not willing",
+  "record_consent": true,
+  "customer_name": "string",
+  "billing_address": "string",
+  "contact_name": "string",
+  "phone_number": "string",
+  "email_address": "string",
+  "calling_window": ["2026-03-12T09:00:00", "2026-03-12T17:30:00"],
+  "time_zone": "America/New_York",
+  "Call_failed": {
+    "status": "string",
+    "errors": ["string"],
+    "summary": {
+      "total_errors": 0,
+      "error_categories": ["string"]
+    }
+  },
+  "call_data": {
+    "attempt_number": 0,
+    "call_start_at": "2026-03-13T08:14:12.030Z",
+    "call_end_at": "2026-03-13T08:14:12.030Z",
+    "call_status": "string",
+    "Voice mail": true,
+    "Transcript": {},
+    "Actions": {}
+  }
+}
+
+Sample API Response (Call Handle Output):
+Case ID format = tenant_id + customer_id + unique_id
+
+
+{
+  "case_id": "tnt-20-002-2eae0fe9-e903-4fe9-9655-d5d8497b6d09-a2b190ea2e8c4511ac04a6d78b8876f4",
+  "customer_id": "2eae0fe9-e903-4fe9-9655-d5d8497b6d09",
+  "customer_name": "Gappraj Pvt Ltd",
+  "billing_address": "Secunderabad, Paradise",
+  "contact_name": "Raj",
+  "phone_number": "84312329123",
+  "email_address": "raj@gappraj.com",
+  "preferred_language": "English",
+  "preferred_contact_hours": [
+    "2026-03-12T09:00:00",
+    "2026-03-12T17:30:00"
+  ],
+  "time_zone": "America/New_York",
+  "attempt_number": 0,
+  "multiple_invoice": false,
+  "call_data": {
+    "Actions": {},
+    "Transcript": {},
+    "Voice mail": true,
+    "call_end_at": "2026-03-13T08:14:12.030Z",
+    "call_status": "string",
+    "call_start_at": "2026-03-13T08:14:12.030Z",
+    "attempt_number": 0
+  },
+  "call_failed": {
+    "errors": ["string"],
+    "status": "string",
+    "summary": {
+      "total_errors": 0,
+      "error_categories": ["string"]
+    }
+  }
+}
+
+
+--------------------
+Call Workflow API
+API Endpoint
+POST /call-workflow
+http://localhost:8000/call-workflow
+
+Purpose
+Takes the stored case and:
+✅ Merges full customer data
+✅ Merges all invoice data
+✅ Merges call handler details
+✅ Increments attempt_number automatically
+✅ Max retry attempts = 3
+
+sample response 
+{
+  "case_id": "tnt-20-002-2eae0fe9-e903-4fe9-9655-d5d8497b6d09-136cc762595b4e7e9b56b661cc4f929d",
+  "attempt_number": 3,
+  "customer_info": {
+    "customer_id": "2eae0fe9-e903-4fe9-9655-d5d8497b6d09",
+    "customer_name": "Gappraj Pvt Ltd",
+    "billing_address": "Secunderabad, Paradise",
+    "contact_name": "Raj",
+    "phone_number": "84312329123",
+    "email_address": "raj@gappraj.com",
+    "preferred_language": "English",
+    "time_zone": "string"
+  },
+  "invoice_info": [
+    {
+      "document_number": "INV-1001",
+      "outstanding_balance": 5000,
+      "due_date": "2026-02-20T00:00:00",
+      "days_past_due": 20,
+      "open_ptp": true,
+      "open_dispute": false
+    },
+    {
+      "document_number": "INV-1002",
+      "outstanding_balance": 7500,
+      "due_date": "2026-03-25T00:00:00",
+      "days_past_due": 0,
+      "open_ptp": false,
+      "open_dispute": false
+    },
+    {
+      "document_number": "INV-1003",
+      "outstanding_balance": 12000,
+      "due_date": "2026-01-30T00:00:00",
+      "days_past_due": 40,
+      "open_ptp": true,
+      "open_dispute": false
+    }
+  ],
+  "call_handler": {
+    "Transcript": {},
+    "Voice mail": true,
+    "call_end_at": "2026-03-13T07:16:03.288Z",
+    "call_status": "string",
+    "call_start_at": "2026-03-13T07:16:03.288Z",
+    "attempt_number": 3
+  },
+  "call_failed": {
+    "errors": ["string"],
+    "status": "failed",
+    "summary": {
+      "total_errors": 0,
+      "error_categories": ["string"]
+    }
+  }
+}
+--------------
+
+
+
 
 ### 4. Health Check
 
