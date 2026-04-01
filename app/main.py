@@ -9,6 +9,7 @@ import logging
 from app.database import engine, Base
 from app.routes.routes import router as main_router
 from app.routes.call_handle import router as call_handle_router
+from app.routes.agent_workflow import router as agent_workflow_router
 from app.models import (
     CustomerMasterData, InvoiceBalanceTable, CallQueue, DunningStage,
     CallOutcome, PromiseToPay, Escalation, Dispute, DocumentCopy,
@@ -67,6 +68,7 @@ app.add_middleware(
 # Include routes
 app.include_router(main_router)
 app.include_router(call_handle_router)
+app.include_router(agent_workflow_router)
 
 
 # Root endpoint
