@@ -352,3 +352,121 @@ class CollectionQueue(Base):
     )
 
     customer = relationship("CustomerMaster")
+
+
+
+class PrecallCustData(Base):
+    """Precall Customer Data Table - stores raw webcollect data"""
+    __tablename__ = "precall_cust_data"
+ 
+    id = Column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    customer_id = Column(PG_UUID(as_uuid=True), ForeignKey("customer_master.customer_id"), nullable=False)
+    user_name = Column(Text, nullable=False)
+    user_phone = Column(Text, nullable=True)
+    user_mail = Column(CITEXT, nullable=True)
+    account_status = Column(Text, nullable=True)
+    preferred_language = Column(Text, nullable=True)
+    preferred_contact_time = Column(Text, nullable=True)
+    agent_contact_allowed = Column(Boolean, nullable=True)
+    collector_name = Column(Text, nullable=True)
+    collector_id = Column(Text, nullable=True)
+    billing_address = Column(Text, nullable=True)
+    credit_limit = Column(Numeric(18, 2), nullable=True)
+    invoice_amount = Column(Numeric(18, 2), nullable=True)
+    short_payment = Column(Integer, nullable=True)
+    over_payment = Column(Integer, nullable=True)
+    call_type = Column(Integer, nullable=True)
+    dispute = Column(Numeric(18, 2), nullable=True)
+    payment_terms = Column(Text, nullable=True)
+    status = Column(Text, nullable=True)
+    date = Column(DateTime, nullable=True)
+    notes = Column(JSONB, nullable=True)  # List of strings
+    audio_recording_enable = Column(Boolean, nullable=True)
+    agent_call = Column(Boolean, nullable=True)
+    transcript = Column(Boolean, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+ 
+    # Relationships
+    customer = relationship("CustomerMaster")
+ 
+ 
+class CustCurrentAgent(Base):
+    """Current Agent Data Table - stores precall data plus blob addresses"""
+    __tablename__ = "cust_current_agent"
+ 
+    id = Column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    customer_id = Column(PG_UUID(as_uuid=True), ForeignKey("customer_master.customer_id"), nullable=False)
+    user_name = Column(Text, nullable=False)
+    user_phone = Column(Text, nullable=True)
+    user_mail = Column(CITEXT, nullable=True)
+    account_status = Column(Text, nullable=True)
+    preferred_language = Column(Text, nullable=True)
+    preferred_contact_time = Column(Text, nullable=True)
+    agent_contact_allowed = Column(Boolean, nullable=True)
+    collector_name = Column(Text, nullable=True)
+    collector_id = Column(Text, nullable=True)
+    billing_address = Column(Text, nullable=True)
+    credit_limit = Column(Numeric(18, 2), nullable=True)
+    invoice_amount = Column(Numeric(18, 2), nullable=True)
+    short_payment = Column(Integer, nullable=True)
+    over_payment = Column(Integer, nullable=True)
+    call_type = Column(Integer, nullable=True)
+    dispute = Column(Numeric(18, 2), nullable=True)
+    payment_terms = Column(Text, nullable=True)
+    status = Column(Text, nullable=True)
+    date = Column(DateTime, nullable=True)
+    notes = Column(JSONB, nullable=True)  # List of strings
+    audio_recording_enable = Column(Boolean, nullable=True)
+    agent_call = Column(Boolean, nullable=True)
+    transcript = Column(Boolean, nullable=True)
+    # Additional fields for blob storage addresses
+    transcript_address = Column(Text, nullable=True)
+    audio_address = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+ 
+    # Relationships
+    customer = relationship("CustomerMaster")
+ 
+ 
+class PostcallCustData(Base):
+    """Postcall Customer Data Table - stores caller and postcall analysis data"""
+    __tablename__ = "postcall_cust_data"
+ 
+    id = Column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    customer_id = Column(PG_UUID(as_uuid=True), ForeignKey("customer_master.customer_id"), nullable=False)
+    user_name = Column(Text, nullable=False)
+    user_phone = Column(Text, nullable=True)
+    user_mail = Column(CITEXT, nullable=True)
+    account_status = Column(Text, nullable=True)
+    preferred_language = Column(Text, nullable=True)
+    preferred_contact_time = Column(Text, nullable=True)
+    agent_contact_allowed = Column(Boolean, nullable=True)
+    collector_name = Column(Text, nullable=True)
+    collector_id = Column(Text, nullable=True)
+    billing_address = Column(Text, nullable=True)
+    credit_limit = Column(Numeric(18, 2), nullable=True)
+    invoice_amount = Column(Numeric(18, 2), nullable=True)
+    short_payment = Column(Integer, nullable=True)
+    over_payment = Column(Integer, nullable=True)
+    call_type = Column(Integer, nullable=True)
+    dispute = Column(Numeric(18, 2), nullable=True)
+    payment_terms = Column(Text, nullable=True)
+    status = Column(Text, nullable=True)
+    date = Column(DateTime, nullable=True)
+    notes = Column(JSONB, nullable=True)
+    audio_recording_enable = Column(Boolean, nullable=True)
+    agent_call = Column(Boolean, nullable=True)
+    transcript = Column(Boolean, nullable=True)
+    call_prompt = Column(Text, nullable=True)
+    transcript_address = Column(Text, nullable=True)
+    audio_address = Column(Text, nullable=True)
+    action_items = Column(JSONB, nullable=True)
+    summary = Column(Text, nullable=True)
+    categorization = Column(Text, nullable=True)
+    message = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+ 
+    customer = relationship("CustomerMaster")
