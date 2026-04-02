@@ -316,7 +316,7 @@ class CallData(BaseModel):
     call_end_at: Optional[datetime] = None
     call_status: Optional[str] = None
     Voice_mail: Optional[bool] = Field(default=None, alias="Voice mail")
-    Transcript: Optional[dict] = None
+    Transcript_address: Optional[dict] = None
     Actions: Optional[dict] = None
 
     # <-- VALIDATION RULE FOR ATTEMPT_NUMBER -->
@@ -354,7 +354,7 @@ class CollectionQueueBase(BaseModel):
     due_at: Optional[datetime] = None
 
     call_notes: Optional[List[CallNote]] = None
-    call_type: Optional[str] = None
+    call_type: Optional[int] = None
 
     activity_status: Optional[bool] = None
     # activity_empty_reason: Optional[str] = None
@@ -423,11 +423,11 @@ class CollectionQueueSlimOut(BaseModel):
     customer_id: uuid.UUID
 
     # customer info
-    customer_name: Optional[str] = None
+    user_name: Optional[str] = None
     billing_address: Optional[str] = None
     contact_name: Optional[str] = None
-    phone_number: Optional[str] = None
-    email_address: Optional[str] = None
+    user_phone: Optional[str] = None
+    user_email: Optional[str] = None
 
     preferred_language: Optional[str] = None
     preferred_contact_hours: Optional[List[datetime]] = None
@@ -439,6 +439,7 @@ class CollectionQueueSlimOut(BaseModel):
 
     call_data: Optional[dict] = None
     call_failed: Optional[dict] = None
+    call_type: Optional[int] = None
 
     @field_serializer("preferred_contact_hours")
     def serialize_hours(self, v):

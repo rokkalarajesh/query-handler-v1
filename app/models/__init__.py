@@ -323,7 +323,7 @@ class CollectionQueue(Base):
     due_at = Column(DateTime, nullable=True)
 
     call_notes = Column(JSONB, nullable=True)
-    call_type = Column(Text, nullable=True)
+    call_type = Column(Integer, nullable=True, server_default="1")
 
     activity_status = Column(Boolean, nullable=True)
     # activity_empty_reason = Column(Text, nullable=True)
